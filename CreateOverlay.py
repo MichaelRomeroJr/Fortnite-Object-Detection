@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Created on Thu Jun  6 19:09:56 2019 @author: micha"""
 import numpy as np
 import cv2
 from time import sleep
@@ -15,9 +16,12 @@ from PIL import Image, ImageTk
 
 class ImageLabel(tk.Label): 
     "A Label that displays images, and plays them if they are gifs    :im: A PIL Image instance or a string filename"
-    def load(self, im):
+    #def load(self, im):
+    def load(self, im, width, height):
         if isinstance(im, str):
             im = Image.open(im)
+            im = im.resize((width,height)) #Resize target box to  size of rectangle
+            print(type(im))
         frames = []
         try:
             for i in count(1):
@@ -43,14 +47,18 @@ class ImageLabel(tk.Label):
             self.config(image=next(self.frames))
             self.after(self.delay, self.next_frame)
 
-def run(imgpath):
+#def run(imgpath):
+def run(imgpath, width, height, x, y):
     root = tk.Tk()
     lbl = ImageLabel(root)
     lbl.pack()
-    lbl.load(imgpath)
+    w, h = width, height
+    lbl.load(imgpath, w, h)
     
     label = lbl
     label.master.overrideredirect(True)
+    GeometryString = "+" + str(x) + "+" + str(y)
+    label.master.geometry(GeometryString)
     #label.master.geometry("+250+250")
 
     label.master.lift()
@@ -65,7 +73,8 @@ def run(imgpath):
     win32api.SetWindowLong(hWindow, win32con.GWL_EXSTYLE, exStyle)
 
     label.pack()
-    root.after(3000, root.destroy)
+    #root.after(3000, root.destroy)
+    root.after(300, root.destroy)
     label.mainloop()
     
     return
