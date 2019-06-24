@@ -3,26 +3,20 @@ import torch.nn as nn
 from torch.autograd import Variable
 import numpy as np
 
-""" Note: Returns the confidence score of the objected detected
-          Omits first object detected since that's likely the user 
-          since it's a first person shooter the game play view has the user in full view and is usually detected first. """
-import torch
-import torch.nn as nn
-from torch.autograd import Variable
-import numpy as np
-
 def run(tensor):
-    try: #Multiple objects have been detected
-        InitialConfidence = tensor[0][5] #Confidence of initial objected detected
+    try:
+        InitialConfidence = tensor[0][5]
         
         PrepReturnTensor = tensor[0]
-
+        
+        print("InitialtConfidence: ", InitialConfidence)
+        
         NumberofTensors = 0
-        for t in tensor: 
-            #Iterate through each tensor. If confidence is higher than intial confedence then update return tensor
+        for t in tensor:
             CurrentConfidence = t[5]
-    
+            print("CurrentConfidence: ", CurrentConfidence)
             if CurrentConfidence > InitialConfidence:
+                print("CurrentConfidence > InitialConfidence: ", CurrentConfidence > InitialConfidence)
                 PrepReturnTensor = t
                 
             NumberofTensors+=1
@@ -31,14 +25,16 @@ def run(tensor):
            
         return ReturnTensor
 
-    except: #One object detected
-        print("Exception")
+    except: #Multiple objects have not been detected
+        print("Exception: ConfidenceCheck.run() error")
         return tensor
+
 
 def score(tensor):
     try:
-        score = tensor[0][5]
-        return score.item()
-    except:
-        score = 0
-        return score
+        confidence = tensor[5]
+        return confidence
+
+    except: #Multiple objects have not been detected
+        print("Exception: ConfidenceCheck.score() error")
+        return 0    
