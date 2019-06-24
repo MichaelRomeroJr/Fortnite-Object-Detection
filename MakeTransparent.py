@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Created on Thu Jun  6 19:09:56 2019 @author: micha"""
 import numpy as np
 import cv2
 from time import sleep
