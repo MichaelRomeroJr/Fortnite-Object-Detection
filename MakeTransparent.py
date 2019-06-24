@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Created on Thu Jun  6 19:09:56 2019 @author: MichaelRomeroJr"""
+"""Created on Thu Jun  6 19:09:56 2019 @author: micha"""
 import numpy as np
 import cv2
 from time import sleep
@@ -43,7 +43,6 @@ class ImageLabel(tk.Label):
         if self.frames:
             self.config(image=next(self.frames))
             self.after(self.delay, self.next_frame)
-
 
 def run(imgpath):
     root = tk.Tk()
