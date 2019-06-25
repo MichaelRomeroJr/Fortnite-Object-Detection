@@ -21,7 +21,6 @@ class ImageLabel(tk.Label):
         if isinstance(im, str):
             im = Image.open(im)
             im = im.resize((width,height)) #Resize target box to  size of rectangle
-            print(type(im))
         frames = []
         try:
             for i in count(1):
@@ -33,8 +32,8 @@ class ImageLabel(tk.Label):
         try:
             self.delay = im.info['duration']
         except:
-            self.delay = 100
-
+            #self.delay = 100
+            self.delay = 10
         if len(frames) == 1:
             self.config(image=next(self.frames))
         else:
@@ -67,14 +66,13 @@ def run(imgpath, width, height, x, y):
     label.master.wm_attributes("-transparentcolor", "white")
 
     hWindow = pywintypes.HANDLE(int(label.master.frame(), 16))
-    # http://msdn.microsoft.com/en-us/library/windows/desktop/ff700543(v=vs.85).aspx
-    # The WS_EX_TRANSPARENT flag makes events (like mouse clicks) fall through the window.
+
     exStyle = win32con.WS_EX_COMPOSITED | win32con.WS_EX_LAYERED | win32con.WS_EX_NOACTIVATE | win32con.WS_EX_TOPMOST | win32con.WS_EX_TRANSPARENT
     win32api.SetWindowLong(hWindow, win32con.GWL_EXSTYLE, exStyle)
 
     label.pack()
     #root.after(3000, root.destroy)
-    root.after(300, root.destroy)
+    root.after(50, root.destroy)
     label.mainloop()
     
     return
