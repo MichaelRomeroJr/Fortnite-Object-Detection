@@ -5,6 +5,8 @@ import numpy as np
 from time import sleep
 import time
 
+from util import *
+
 def run(tensor): #Only Display Object With Highest Confidence Score
     """TODO: Return only object with the second highest score """
     try:
@@ -57,6 +59,6 @@ def SecondHighest(tensor):
         
         return ReturnTensor
     except:
-        print("Exception")
+        #print("Exception")
         return tensor
     
