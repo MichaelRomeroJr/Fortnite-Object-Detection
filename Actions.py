@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*- 
 import pyautogui
+import time
 from time import sleep
 import pynput
 from pynput import keyboard
 
-"""Import tensor that contains coordinates of drawn rectangles
-    MoveMouse() moves the mouse to the center of the target box
-     click() will result in firing in the middle of the rectangle
-     TODO: Create function that will only fire in the center of the rectangle
-          while a certain key is pressed. Otherwise, gameplay will be hard when 
-          the cursor is constantly moving to rectangles being drawn"""
 
 def MoveMouse(tensor):
     c1 = tuple(tensor[1:3].int()) #Top Left Coordinates
@@ -26,7 +21,7 @@ def MoveMouse(tensor):
     y =y1 + int(height/2)
     
     pyautogui.moveTo(x, y) #Move
-    #pyautogui.click() #Click
+    pyautogui.click(clicks=2) #Click
     sleep(5)
     
     return 
@@ -54,6 +49,55 @@ def on_release(key):
 #listener = mouse.Listener( on_press=on_press, on_release=on_release)
 #listener.start()
 
+KeyPressed = ''    
+def on_press(key, StartTime):
+    CurrentTime = time.time()
+    ScanTime = CurrentTime - StartTime
     
+    if ScanTime > 5: #Running for 5 seconds
+        listener.stop()
+        return
+    
+    print("ON PRESS")
+    try:
+        KeyPressed = str(key.char)
+        print('alphanumeric key {0} pressed'.format(key.char))
+    except AttributeError:
+        KeyPressed = str(key)
+        print('special key {0} pressed'.format(key))
+    return
 
+def on_release(key):
+    print('{0} released'.format(key))
+    if key == keyboard.Key.esc:
+        # Stop listener
+        return False
+
+def KeyboardInput():
+    KeyboardScans=0
+    StartTime = time.time()
+    print("First KeyPressed: ", KeyPressed)
+    # Collect events until released
+    #with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+    #    listener.join()    
+     
+    with keyboard.Listener(on_press=on_press(None, StartTime), on_release=on_release) as listener:
+        listener.join()  
+       
+    print("Second KeyPressed: ", KeyPressed)
     
+    return KeyPressed
+
+"""
+# Collect events until released
+with keyboard.Listener(
+        on_press=on_press,
+        on_release=on_release) as listener:
+    listener.join()
+
+# ...or, in a non-blocking fashion:
+listener = keyboard.Listener(
+    on_press=on_press,
+    on_release=on_release)
+listener.start()
+"""
