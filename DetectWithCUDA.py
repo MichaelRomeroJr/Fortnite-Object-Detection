@@ -76,19 +76,9 @@ def write(x, results, confidencescore):
     ObjectedDetected = label
     
     if ObjectedDetected == 'person': 
+        #print('Objected Detected: ', ObjectedDetected )
         Draw.run(x)
         Actions.MoveMouse(x)
-    #Draw.run(x)
-    #img = results
-    #cls = int(x[-1])
-    #color = (55, 19, 148) #color = random.choice(colors)
-    #score = str(confidencescore)[:4]
-    #label = "{0}".format(classes[cls]) +' ' + score
-    #cv2.rectangle(img, c1, c2,color, thickness=10) #cv2.rectangle(img, c1, c2,color, 1)
-    #t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1 , 1)[0]
-    #c2 = c1[0] + t_size[0] + 3, c1[1] + t_size[1] + 4
-    #cv2.rectangle(img, c1, c2,color, -1)
-    #cv2.putText(img, label, (c1[0], c1[1] + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225,255,255], 1);
      
     return img
 
@@ -98,15 +88,13 @@ def Running():
     start = time.time()
     RunningCount = 0
 
-    while RunningCount < 2:
+    while RunningCount < 1:
         #ret, frame = cap.read()
         ret = True
             
         if ret: 
             """StreamFromMonitor reads the moniitor saves it as an image than opens it up as a frame to work with"""
             start = time.time()
-            #StreamFromMonitor.run() 
-            #frame = cv2.imread("C:/Users/micha/OneDrive/Desktop/Screen.jpeg") #<class 'numpy.ndarray'>
             frame = StreamFromMonitor.Stream() 
             
             img = prep_image(frame, inp_dim)
@@ -132,7 +120,7 @@ def Running():
                 
             if ObjectsDetected > 1:
                 #output = ConfidenceCheck.run(output)
-                output = ConfidenceCheck.SecondHighest(output)
+                #output = ConfidenceCheck.SecondHighest(output)
                 #confidencescore = ConfidenceCheck.score(output)
                 confidencescore = 0
             
