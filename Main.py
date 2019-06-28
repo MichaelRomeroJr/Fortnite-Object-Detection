@@ -7,6 +7,10 @@ from pynput import keyboard
 
 import DetectWithCUDA
 
+Going = True
+while Going:
+    DetectWithCUDA.Running()
+
 def on_press(key):
     try: #alphanumeric key
         keypressed = key.char
@@ -16,7 +20,7 @@ def on_press(key):
         print("key: w", keypressed)
 
     if keypressed == 'f': #print("You pressed F")
-        
+        print("Run AutoDetection")
         DetectWithCUDA.Running()
 
 def on_release(key):
