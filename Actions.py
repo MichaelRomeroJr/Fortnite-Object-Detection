@@ -20,9 +20,15 @@ def MoveMouse(tensor):
     x = x1 + int(width/2)
     y =y1 + int(height/2)
     
-    pyautogui.moveTo(x, y) #Move
-    pyautogui.click(clicks=2) #Click
-    sleep(5)
+    #print("CURRENT MOUSE COORDINATES: ", pyautogui.position())
+    #print("MOVE MOUSE TO: ", x, y)
+    #pyautogui.moveTo(x, y) #Move
+    #pyautogui.moveTo(x, y) #Move
+    #sleep(1)
+    #pyautogui.click()
+    #sleep(1)
+    #pyautogui.click(clicks=2) #Click
+    #sleep(5)
     
     return 
 
@@ -39,16 +45,6 @@ def on_release(key):
         key))
     if key == keyboard.Key.esc: # Stop listener    
         return False
-
-# Collect events until released
-#with keyboard.Listener(on_press=on_press,
-#        on_release=on_release) as listener:
-#        listener.join()
-
-# ...or, in a non-blocking fashion:
-#listener = mouse.Listener( on_press=on_press, on_release=on_release)
-#listener.start()
-
 KeyPressed = ''    
 def on_press(key, StartTime):
     CurrentTime = time.time()
@@ -88,16 +84,4 @@ def KeyboardInput():
     
     return KeyPressed
 
-"""
-# Collect events until released
-with keyboard.Listener(
-        on_press=on_press,
-        on_release=on_release) as listener:
-    listener.join()
-
-# ...or, in a non-blocking fashion:
-listener = keyboard.Listener(
-    on_press=on_press,
-    on_release=on_release)
-listener.start()
-"""
+    windll.user32.mouse_event(c_uint(0x0001), c_uint(0), c_uint(y),c_uint(0), c_uint(0))
