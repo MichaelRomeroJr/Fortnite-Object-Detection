@@ -7,7 +7,7 @@ Fornite Object Detection using Darknet's YOLOv3 implemented via PyTorch.<br>
 -overlay image on running Fortnite with the ability to click through the image as to not effect gameplay<br>
 <b>Future Updates:</b><br>
 -Distinguish between persons identified. i.e. teammates vs. enemies<br>
--Move mouse to center of rectangle and fire
+-Move mouse to center of rectangle and fire<br>
 -Train NN based on Fortnite footage
 
 <br><br>
