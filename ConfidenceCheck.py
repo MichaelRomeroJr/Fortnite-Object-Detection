@@ -1,64 +1,45 @@
-import torch
+# -*- coding: utf-8 -*-
+from __future__ import division
+import torch 
 import torch.nn as nn
 from torch.autograd import Variable
 import numpy as np
-from time import sleep
-import time
-
+import cv2 
 from util import *
+import argparse
+import os 
+import os.path as osp
+from darknet import Darknet
+import pickle as pkl
+import pandas as pd
+import random
+import time
+from time import sleep
 
-def run(tensor): #Only Display Object With Highest Confidence Score
-    """TODO: Return only object with the second highest score """
-    try:
-        InitialConfidence = tensor[0][5].data.tolist()
-        PrepReturnTensor = tensor[0]
+from PIL import Image, ImageTk
 
-        NumberofTensors = 0
-        for t in tensor:
-            CurrentConfidence = t[5].data.tolist()
-            #print("CurrentConfidence: ", CurrentConfidence)
-            if CurrentConfidence > InitialConfidence:
-                PrepReturnTensor = t
-                
-            NumberofTensors+=1
-        n = PrepReturnTensor.tolist() #Convert PrepReturnTensor tolist
-        ReturnTensor = torch.Tensor([n]).cuda() #Create new 2D tensor with one entry, n
-        return ReturnTensor
+import CreateOverlay
+import ConfidenceCheck
 
-    except: #Multiple objects have not been detected
-        #print("Exception: ConfidenceCheck.run() error")
-        return tensor
+import StreamFromMonitor
 
-def score(tensor):
-    try:
-        confidence = tensor[5].data.tolist()
-        return confidence
-        
-    except: #Multiple objects have not been detected
-        print("Exception: ConfidenceCheck.score() error")
-        return 0    
+def Rectangle(tensor):
+    RectanglePath = "C:/Users/micha/OneDrive/Desktop/Red.jpg"
+    c1 = tuple(tensor[1:3].int()) #Top Left Coordinates
+    c2 = tuple(tensor[3:5].int()) #Bottom Right Coordinates
     
-def SecondHighest(tensor): 
-    try:
-        NumberObjectsdDetected = len(tensor)
-        ListOfTensors = []
-        if NumberObjectsdDetected > 1: #Multiple Objects
-            for i in range(NumberObjectsdDetected):
-                ListOfTensors.append(tensor[i].tolist())
-        
-            ListOfTensorsSorted = sorted(ListOfTensors, key=lambda x: x[5], reverse=True)
+    x1 = int(c1[0].item()) #+175
+    y1 = int(c1[1].item()) #+133
+    x2 = int(c2[0].item()) #+175
+    y2 = int(c2[1].item()) #+133
+     
+    width = x2 -  x1
+    height = y2 - y1 
 
-            for i in ListOfTensorsSorted:
-                pass
-        
-            SecondHighestList = ListOfTensorsSorted[1]  
-            ReturnTensor = torch.Tensor([SecondHighestList]).cuda()
-        
-        else: #One Object Detected
-            ReturnTensor = tensor
-        
-        return ReturnTensor
-    except:
-        #print("Exception")
-        return tensor
+    return width, height, x1, y1, RectanglePath
+
+def run(tensor):
+    width, height, x, y,RectanglePath = Rectangle(tensor)
+    CreateOverlay.run(RectanglePath, width, height, x, y)
     
+    return
