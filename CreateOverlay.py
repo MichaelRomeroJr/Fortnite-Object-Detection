@@ -17,7 +17,7 @@ from PIL import Image, ImageTk
 class ImageLabel(tk.Label): 
     "A Label that displays images, and plays them if they are gifs    :im: A PIL Image instance or a string filename"
     #def load(self, im):
-    def load(self, im, width, height):
+    def load(self, im, width, height):        
         if isinstance(im, str):
             im = Image.open(im)
             im = im.resize((width,height)) #Resize target box to  size of rectangle
@@ -46,19 +46,19 @@ class ImageLabel(tk.Label):
             self.config(image=next(self.frames))
             self.after(self.delay, self.next_frame)
 
-#def run(imgpath):
-def run(imgpath, width, height, x, y):
+def run(width, height, x, y):
     root = tk.Tk()
     lbl = ImageLabel(root)
     lbl.pack()
     w, h = width, height
+    
+    imgpath = Image.new('RGB', (w, h), color = 'red') #Create Black Rectangle to overlay over target
     lbl.load(imgpath, w, h)
     
     label = lbl
     label.master.overrideredirect(True)
     GeometryString = "+" + str(x) + "+" + str(y)
-    label.master.geometry(GeometryString)
-    #label.master.geometry("+250+250")
+    label.master.geometry(GeometryString) #label.master.geometry("+250+250")
 
     label.master.lift()
     label.master.wm_attributes("-topmost", True)
@@ -71,8 +71,7 @@ def run(imgpath, width, height, x, y):
     win32api.SetWindowLong(hWindow, win32con.GWL_EXSTYLE, exStyle)
 
     label.pack()
-    #root.after(3000, root.destroy)
-    root.after(50, root.destroy)
+    root.after(25, root.destroy) #root.after(3000, root.destroy)
     label.mainloop()
     
     return
