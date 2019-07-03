@@ -15,7 +15,7 @@ import random
 import time
 from time import sleep
 
-from PIL import Image, ImageTk
+#from PIL import Image, ImageTk
 
 #import CreateOverlay
 import ConfidenceCheck
@@ -24,10 +24,13 @@ import StreamFromMonitor
 
 import Draw
 
-import Actions
+#import Actons
+
+import NNSetup
+###################################################################
 
 def arg_parse():
-    """    Parse arguements to the detect module"""
+    "    Parse arguements to the detect module"
     parser = argparse.ArgumentParser(description='YOLO v3 Detection Module')
     parser.add_argument("--bs", dest = "bs", help = "Batch size", default = 1)
     parser.add_argument("--confidence", dest = "confidence", help = "Object Confidence to filter predictions", default = 0.5)
@@ -44,6 +47,7 @@ confidence = float(args.confidence)
 nms_thesh = float(args.nms_thresh)
 start = 0
 CUDA = torch.cuda.is_available()
+
 
 num_classes = 80
 classes = load_classes("C:/Users/micha/data/coco.names")
@@ -76,14 +80,23 @@ def write(x, results, confidencescore):
     ObjectedDetected = label
     
     if ObjectedDetected == 'person': 
-        #print('Objected Detected: ', ObjectedDetected )
+        
+        #print("Object Detected: ", ObjectedDetected)
         Draw.run(x)
-        Actions.MoveMouse(x)
-     
+        #Actions.MoveMouse(x)
+        pass
+   
+    # else :
+   #     print("Object Detected: ", ObjectedDetected)
+   #     print(type(ObjectedDetected))
     return img
 
-#Detection phase  
+#############################################################################
+
+#####################################################################################
+
 def Running():  
+    
     frames = 0  
     start = time.time()
     RunningCount = 0
@@ -110,15 +123,16 @@ def Running():
         
             with torch.no_grad():
                 output = model(Variable(img, volatile = True), CUDA)
-            output = write_results(output, confidence, num_classes, nms_conf = nms_thesh)
+            output = write_results(output, confidence, num_classes, nms_thesh)
 
             """Display object with highest confidence score"""
             try:
                 ObjectsDetected = len(output)
             except:
                 ObjectsDetected = 0
-                
-            if ObjectsDetected > 1:
+            
+            if ObjectsDetected > 0: 
+            #if ObjectsDetected > 1:
                 #output = ConfidenceCheck.run(output)
                 #output = ConfidenceCheck.SecondHighest(output)
                 #confidencescore = ConfidenceCheck.score(output)
@@ -160,7 +174,7 @@ def Running():
 
                 stop = time.time()
                 duration = stop-start
-                print(duration)
+                #print(duration)
             
             if ObjectsDetected == 1:
                 pass
@@ -173,5 +187,3 @@ def Running():
         
     
     return
-
-Running()
