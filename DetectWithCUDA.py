@@ -14,19 +14,12 @@ import pandas as pd
 import random
 import time
 from time import sleep
-
-#from PIL import Image, ImageTk
-
-#import CreateOverlay
 import ConfidenceCheck
 
 import StreamFromMonitor
 
 import Draw
 
-#import Actons
-
-import NNSetup
 ###################################################################
 
 def arg_parse():
@@ -47,7 +40,6 @@ confidence = float(args.confidence)
 nms_thesh = float(args.nms_thresh)
 start = 0
 CUDA = torch.cuda.is_available()
-
 
 num_classes = 80
 classes = load_classes("C:/Users/micha/data/coco.names")
