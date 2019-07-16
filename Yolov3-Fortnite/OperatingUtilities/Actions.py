@@ -15,17 +15,16 @@ def MoveMouse(tensor):
     width = x2 -  x1
     height = y2 - y1 
 
-    x = x1 + int(width/2)
-    y =y1 + int(height/2)
+    CenterX = x1 + int(width/2)
+    CenterY =y1 + int(height/2)
     
-    #pyautogui.moveTo(x, y) #Move 
-    #pyautogui.click()
-    #pyautogui.click(clicks=2) #Click
+    #pyautogui.moveTo(CenterX, CenterY)  
+    #pyautogui.click(clicks=2) #Double click
     
     return 
 
 def Fire(x, y, width, height):
-    Ingame_Keybind_Fire = "k" #Ingame Keybind set to Fire(Not Mouse1!!!)
+    Ingame_Keybind_Fire = "k" #Ingame Keybind set to Fire(Not Mouse!!!)
     coordinates = pyautogui.position()
     x1, y1 = x, y
     x2, y2 = x+width, y+height
