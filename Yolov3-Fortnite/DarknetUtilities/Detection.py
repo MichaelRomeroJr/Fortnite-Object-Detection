@@ -14,6 +14,7 @@ import pickle as pkl
 import pandas as pd
 import time
 from time import sleep
+import sys
 
 from OperatingUtilities import ConfidenceCheck
 from OperatingUtilities import StreamFromMonitor
@@ -39,7 +40,6 @@ nms_thesh = float(args.nms_thresh)
 start = 0
 CUDA = torch.cuda.is_available()
 
-
 num_classes = 80
 classes = load_classes("C:/Users/micha/data/coco.names")
 
@@ -59,115 +59,80 @@ if CUDA:
 #Set the model in evaluation mode
 model.eval()
 
-def write(x, results, confidencescore):
-    #confidencescore = str(ConfidenceCheck.score(x))[7:] 
-    confidencescore = str(ConfidenceCheck.score(x))[:4] 
-    c1 = tuple(x[1:3].int())
-    c2 = tuple(x[3:5].int())
+def write(x, results):
     cls = int(x[-1])
     img = results
-    label = "{0}".format(classes[cls]) # +' ' + score
-    ObjectedDetected = label
+    ObjectedDetected = "{0}".format(classes[cls]) #label 
     
     if ObjectedDetected == 'person': 
         #print("Object Detected: ", ObjectedDetected)
-        Draw.run(x)
+        x, y, width, height = Draw.run(x)
+        Actions.Fire(x,y, width, height)
         #Actions.MoveMouse(x)
 
-    #else :
+    else :
+        #Somet other object has been detects
         #print("Object Detected: ", ObjectedDetected)
-        
+        pass
+    
     return img
 
-def Running():  
-    
-    frames = 0  
+def Running():   
     start = time.time()
-    RunningCount = 0
-
-    while RunningCount < 1:
-        #ret, frame = cap.read()
-        ret = True
             
-        if ret: 
-            """StreamFromMonitor reads the moniitor saves it as an image than opens it up as a frame to work with"""
-            start = time.time()
-            frame = StreamFromMonitor.Stream() 
+    try: 
+        """StreamFromMonitor reads the moniitor saves it as an image than opens it up as a frame to work with"""
+        start = time.time()
+        frame = StreamFromMonitor.Stream() 
             
-            img = prep_image(frame, inp_dim)
+        img = prep_image(frame, inp_dim)
 
-            #cv2.
-            ("a", frame)
-            im_dim = frame.shape[1], frame.shape[0]
-            im_dim = torch.FloatTensor(im_dim).repeat(1,2)   
+        im_dim = frame.shape[1], frame.shape[0]
+        im_dim = torch.FloatTensor(im_dim).repeat(1,2)   
                      
-            if CUDA:
-                im_dim = im_dim.cuda()
-                img = img.cuda()
+        if CUDA:
+            im_dim = im_dim.cuda()
+            img = img.cuda()
         
-            with torch.no_grad():
-                output = model(Variable(img, volatile = True), CUDA)
-            output = write_results(output, confidence, num_classes, nms_thesh)
+        with torch.no_grad():
+            output = model(Variable(img, volatile = True), CUDA)
+        output = write_results(output, confidence, num_classes, nms_thesh)
 
-            """Display object with highest confidence score"""
-            try:
-                ObjectsDetected = len(output)
-            except:
-                ObjectsDetected = 0
+        """Display object with highest confidence score"""
+        try:
+            ObjectsDetected = len(output)
+        except:
+            ObjectsDetected = 0
             
-            if ObjectsDetected > 0:  #Any objects have been detected
-            #if ObjectsDetected > 1:
-                #output = ConfidenceCheck.run(output)
-                #output = ConfidenceCheck.SecondHighest(output)
-                #confidencescore = ConfidenceCheck.score(output)
-                confidencescore = 0
-            
-                if type(output) == int:
-                    frames += 1
-                                   
-                    key = cv2.waitKey(1)
-                    if key & 0xFF == ord('q'):
-                        break
-                    continue
+        if ObjectsDetected > 0:  #Any objects have been detected            
+            im_dim = im_dim.repeat(output.size(0), 1)
+            scaling_factor = torch.min(416/im_dim,1)[0].view(-1,1)
         
-                im_dim = im_dim.repeat(output.size(0), 1)
-                scaling_factor = torch.min(416/im_dim,1)[0].view(-1,1)
+            output[:,[1,3]] -= (inp_dim - scaling_factor*im_dim[:,0].view(-1,1))/2
+            output[:,[2,4]] -= (inp_dim - scaling_factor*im_dim[:,1].view(-1,1))/2
         
-                output[:,[1,3]] -= (inp_dim - scaling_factor*im_dim[:,0].view(-1,1))/2
-                output[:,[2,4]] -= (inp_dim - scaling_factor*im_dim[:,1].view(-1,1))/2
-        
-                output[:,1:5] /= scaling_factor
+            output[:,1:5] /= scaling_factor
 
-                for i in range(output.shape[0]):
-                    output[i, [1,3]] = torch.clamp(output[i, [1,3]], 0.0, im_dim[i,0])
-                    output[i, [2,4]] = torch.clamp(output[i, [2,4]], 0.0, im_dim[i,1])
+            for i in range(output.shape[0]):
+                output[i, [1,3]] = torch.clamp(output[i, [1,3]], 0.0, im_dim[i,0])
+                output[i, [2,4]] = torch.clamp(output[i, [2,4]], 0.0, im_dim[i,1])
     
-                classes = load_classes('C:/Users/micha/data/coco.names')
-                colors = pkl.load(open("pallete", "rb"))
+            classes = load_classes('C:/Users/micha/data/coco.names')
+            colors = pkl.load(open("pallete", "rb"))
+                         
+            list(map(lambda x: write(x, frame), output))
             
-                
-                list(map(lambda x: write(x, frame, confidencescore), output))
+            stop = time.time()
+            duration = stop-start
+            #print(duration)
             
-                """Display the image with drawn rectangles"""
-                #cv2.imshow("frame", frame)
-                                 
-                key = cv2.waitKey(1)
-                if key & 0xFF == ord('q'): #print("'if key & 0xFF == ord('q')' break")
-                    break
-                frames += 1
-
-                stop = time.time()
-                duration = stop-start
-                #print(duration)
-            
-            if ObjectsDetected == 1:
-                pass
-            else:
-                pass #break
-        RunningCount+=1    
+        if ObjectsDetected == 1:
+            pass
+        else:
+            pass #break
         
-    else: #Frames we want to skip #print('ERROR: thingy = False')
-        return
-        
-    
+    except: #Frames we want to skip #print('ERROR: thingy = False')
+        print('Quitting...')
+        sys.exit()
+           
     return
