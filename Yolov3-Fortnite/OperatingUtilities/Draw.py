@@ -7,6 +7,7 @@ import numpy as np
 import cv2 
 import os 
 import os.path as osp
+
 from OperatingUtilities import CreateOverlay
 
 def Rectangle(tensor):
@@ -28,4 +29,4 @@ def Rectangle(tensor):
 def run(tensor):
     width, height, x, y = Rectangle(tensor) #Get Coordinates for rectangle to draw on screen
     CreateOverlay.run(width, height, x, y) #Draw rectangle on screen with the ability to click through it
-    return
+    return x, y, width, height
