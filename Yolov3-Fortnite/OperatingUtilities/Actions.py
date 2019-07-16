@@ -2,9 +2,7 @@
 import pyautogui
 import time
 from time import sleep
-import pynput
-from pynput import keyboard
-
+import keyboard
 
 def MoveMouse(tensor):
     c1 = tuple(tensor[1:3].int()) #Top Left Coordinates
@@ -20,68 +18,21 @@ def MoveMouse(tensor):
     x = x1 + int(width/2)
     y =y1 + int(height/2)
     
-    #print("CURRENT MOUSE COORDINATES: ", pyautogui.position())
-    #print("MOVE MOUSE TO: ", x, y)
-    #pyautogui.moveTo(x, y) #Move
-    #pyautogui.moveTo(x, y) #Move
-    #sleep(1)
+    #pyautogui.moveTo(x, y) #Move 
     #pyautogui.click()
-    #sleep(1)
     #pyautogui.click(clicks=2) #Click
-    #sleep(5)
     
     return 
 
-def on_press(key):
-    try: #alphanumeric key
-        keypressed = key.char
-        print("key: ", keypressed)
-    except AttributeError: #special key
-        keypressed = key
-        print("key: ", keypressed)
-
-def on_release(key):
-    print('{0} released'.format(
-        key))
-    if key == keyboard.Key.esc: # Stop listener    
-        return False
-KeyPressed = ''    
-def on_press(key, StartTime):
-    CurrentTime = time.time()
-    ScanTime = CurrentTime - StartTime
-    
-    if ScanTime > 5: #Running for 5 seconds
-        listener.stop()
-        return
-    
-    print("ON PRESS")
-    try:
-        KeyPressed = str(key.char)
-        print('alphanumeric key {0} pressed'.format(key.char))
-    except AttributeError:
-        KeyPressed = str(key)
-        print('special key {0} pressed'.format(key))
+def Fire(x, y, width, height):
+    Ingame_Keybind_Fire = "k" #Ingame Keybind set to Fire(Not Mouse1!!!)
+    coordinates = pyautogui.position()
+    x1, y1 = x, y
+    x2, y2 = x+width, y+height
+    CurrentX,CurrentY = coordinates[0], coordinates[1]
+    print(coordinates)
+    if (x1<CurrentX<x2) & (y1<CurrentY<y2): #Current mouse position is in rectangle
+        #pyautogui.click(clicks=2) #Click
+        keyboard.press(Ingame_Keybind_Fire) #Send the input to fire the weapon
+        print("Press FIRE")
     return
-
-def on_release(key):
-    print('{0} released'.format(key))
-    if key == keyboard.Key.esc:
-        # Stop listener
-        return False
-
-def KeyboardInput():
-    KeyboardScans=0
-    StartTime = time.time()
-    print("First KeyPressed: ", KeyPressed)
-    # Collect events until released
-    #with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
-    #    listener.join()    
-     
-    with keyboard.Listener(on_press=on_press(None, StartTime), on_release=on_release) as listener:
-        listener.join()  
-       
-    print("Second KeyPressed: ", KeyPressed)
-    
-    return KeyPressed
-
-    windll.user32.mouse_event(c_uint(0x0001), c_uint(0), c_uint(y),c_uint(0), c_uint(0))
