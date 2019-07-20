@@ -1,22 +1,15 @@
 from __future__ import division
 import torch 
-import torch.nn as nn
 from torch.autograd import Variable
-import numpy as np
-import cv2 
 from DarknetUtilities import util
 from DarknetUtilities.util import *
 import argparse
-import os 
-import os.path as osp
 from darknet import Darknet
-import pickle as pkl
-import pandas as pd
 import time
-from time import sleep
-import sys
+#from time import sleep
 
-from OperatingUtilities import ConfidenceCheck
+from DarknetUtilities import TensorRefinement
+
 from OperatingUtilities import StreamFromMonitor
 from OperatingUtilities import Draw
 from OperatingUtilities import Actions
@@ -37,7 +30,6 @@ args = arg_parse()
 batch_size = int(args.bs)
 confidence = float(args.confidence)
 nms_thesh = float(args.nms_thresh)
-start = 0
 CUDA = torch.cuda.is_available()
 
 num_classes = 80
@@ -65,16 +57,10 @@ def write(x, results):
     ObjectedDetected = "{0}".format(classes[cls]) #label 
     
     if ObjectedDetected == 'person': 
-        #print("Object Detected: ", ObjectedDetected)
         x, y, width, height = Draw.run(x)
-        Actions.Fire(x,y, width, height)
+        #Actions.Fire(x,y, width, height)
         #Actions.MoveMouse(x)
 
-    else :
-        #Somet other object has been detects
-        #print("Object Detected: ", ObjectedDetected)
-        pass
-    
     return img
 
 def Running():   
@@ -83,10 +69,8 @@ def Running():
     try: 
         """StreamFromMonitor reads the moniitor saves it as an image than opens it up as a frame to work with"""
         start = time.time()
-        frame = StreamFromMonitor.Stream() 
-            
+        frame = StreamFromMonitor.Stream()             
         img = prep_image(frame, inp_dim)
-
         im_dim = frame.shape[1], frame.shape[0]
         im_dim = torch.FloatTensor(im_dim).repeat(1,2)   
                      
@@ -96,15 +80,24 @@ def Running():
         
         with torch.no_grad():
             output = model(Variable(img, volatile = True), CUDA)
-        output = write_results(output, confidence, num_classes, nms_thesh)
-
-        """Display object with highest confidence score"""
-        try:
-            ObjectsDetected = len(output)
-        except:
-            ObjectsDetected = 0
             
-        if ObjectsDetected > 0:  #Any objects have been detected            
+        """output is tensor of all objects detected in image """
+        output = write_results(output, confidence, num_classes, nms_thesh)
+                
+        """Pass output through functions to 
+                first: remove all tensors that are not 'people'
+                second: remove 'person at bottom of screen (probably self) """
+        classes = load_classes('C:/Users/micha/data/coco.names')
+        Output_People = TensorRefinement.DeterminePeople(output, classes)
+        output = TensorRefinement.RemoveSelf(Output_People) 
+
+        try:
+            PeopleDetected = len(output)
+            print("People (excluding self) detected: ", PeopleDetected)
+        except:
+            PeopleDetected = 0
+                
+        if PeopleDetected > 0:  #If anyone exlucding yourself is detected         
             im_dim = im_dim.repeat(output.size(0), 1)
             scaling_factor = torch.min(416/im_dim,1)[0].view(-1,1)
         
@@ -117,22 +110,14 @@ def Running():
                 output[i, [1,3]] = torch.clamp(output[i, [1,3]], 0.0, im_dim[i,0])
                 output[i, [2,4]] = torch.clamp(output[i, [2,4]], 0.0, im_dim[i,1])
     
-            classes = load_classes('C:/Users/micha/data/coco.names')
-            colors = pkl.load(open("pallete", "rb"))
-                         
             list(map(lambda x: write(x, frame), output))
-            
+
             stop = time.time()
             duration = stop-start
-            #print(duration)
-            
-        if ObjectsDetected == 1:
-            pass
-        else:
-            pass #break
+            #print(duration)           
         
-    except: #Frames we want to skip #print('ERROR: thingy = False')
-        print('Quitting...')
-        sys.exit()
-           
+    except Exception as ex:
+        print(type(ex), ex)
+        #sys.exit()
+        pass
     return
