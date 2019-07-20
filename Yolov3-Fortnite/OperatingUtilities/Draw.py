@@ -1,13 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
-import torch 
-import torch.nn as nn
-from torch.autograd import Variable
-import numpy as np
-import cv2 
-import os 
-import os.path as osp
-
 from OperatingUtilities import CreateOverlay
 
 def Rectangle(tensor):
@@ -15,11 +6,11 @@ def Rectangle(tensor):
         Output: Coordinates of object detected in tensor"""
     c1 = tuple(tensor[1:3].int()) #Top Left Coordinates
     c2 = tuple(tensor[3:5].int()) #Bottom Right Coordinates
-    
-    x1 = int(c1[0].item()) +175
-    y1 = int(c1[1].item()) +133
-    x2 = int(c2[0].item()) +175
-    y2 = int(c2[1].item()) +133
+
+    x1 = int(c1[0].item()) #+175
+    y1 = int(c1[1].item()) #+133
+    x2 = int(c2[0].item()) #+175
+    y2 = int(c2[1].item()) #+133
      
     width = x2 -  x1
     height = y2 - y1 
