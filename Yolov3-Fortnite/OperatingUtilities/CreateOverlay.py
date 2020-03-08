@@ -4,11 +4,12 @@ from PIL import Image, ImageTk
 from itertools import count, cycle
 
 class ImageLabel(tk.Label): 
-    "A Label that displays images, and plays them if they are gifs    :im: A PIL Image instance or a string filename"
+    """ImageLabel displays iamges repeated (like gifs) """
+   
     def load(self, im, width, height):        
         if isinstance(im, str):
             im = Image.open(im)
-            im = im.resize((width,height)) #Resize target box to  size of rectangle
+            im = im.resize((width,height)) #Resize target box to size of rectangle
         frames = []
         try:
             for i in count(1):
@@ -20,8 +21,7 @@ class ImageLabel(tk.Label):
         try:
             self.delay = im.info['duration']
         except:
-            #self.delay = 100
-            self.delay = 1
+            self.delay = 1 #self.delay = 100
         if len(frames) == 1:
             self.config(image=next(self.frames))
         else:
