@@ -7,6 +7,7 @@ def Rectangle(tensor):
     c1 = tuple(tensor[1:3].int()) #Top Left Coordinates
     c2 = tuple(tensor[3:5].int()) #Bottom Right Coordinates
 
+    #+175 to x-coord & +135 to y-coord when taking sample of image
     x1 = int(c1[0].item()) #+175
     y1 = int(c1[1].item()) #+133
     x2 = int(c2[0].item()) #+175
