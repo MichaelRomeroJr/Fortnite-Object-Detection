@@ -6,7 +6,6 @@ from DarknetUtilities.util import *
 import argparse
 from darknet import Darknet
 import time
-#from time import sleep
 
 from DarknetUtilities import TensorRefinement
 
@@ -15,7 +14,7 @@ from OperatingUtilities import Draw
 from OperatingUtilities import Actions
 
 def arg_parse():
-    "    Parse arguements to the detect module"
+    """Parse arguements to the detect module"""
     parser = argparse.ArgumentParser(description='YOLO v3 Detection Module')
     parser.add_argument("--bs", dest = "bs", help = "Batch size", default = 1)
     parser.add_argument("--confidence", dest = "confidence", help = "Object Confidence to filter predictions", default = 0.5)
@@ -35,7 +34,7 @@ CUDA = torch.cuda.is_available()
 num_classes = 80
 classes = load_classes("C:/Users/micha/data/coco.names")
 
-#Set up the neural network #print("Loading network.....")
+#Set up the neural network 
 model = Darknet(args.cfgfile)
 model.load_weights(args.weightsfile) #print("Network successfully loaded")
 
