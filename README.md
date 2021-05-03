@@ -1,5 +1,10 @@
 # Fortnite-Object-Detection
 Fornite Object Detection using Darknet's YOLOv3 implemented via PyTorch.<br>
+
+Click to view YouTube demo<br>
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/Y0Y_G9msqrc/0.jpg)](https://www.youtube.com/watch?v=Y0Y_G9msqrc)
+
+
 <b>Current functionality:</b><br>
 -Read Monitor as PIL.Image then convert to Numpy array<br>
 -Run Numpy arrayof monitor through neural network to detect objects<br> 
